@@ -15,6 +15,17 @@ filebeat.inputs:
     cluster: ${CLUSTER_ID}
     node_name: ${NODE_NAME}
     component: system.docker
+    {{- range $k,$v := .fields }}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+  {{ if .multilinePattern -}}
+  {{- if ne .multilinePattern ""}}
+  multiline:
+    pattern: {{ .multilinePattern }}
+    negate: false
+    match: after
+  {{- end -}}
+  {{- end }}
 - type: log
   enabled: true
   fields_under_root: true
@@ -24,6 +35,17 @@ filebeat.inputs:
     cluster: ${CLUSTER_ID}
     node_name: ${NODE_NAME}
     component: system.kubelet
+    {{- range $k,$v := .fields }}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+  {{ if .multilinePattern -}}
+  {{- if ne .multilinePattern ""}}
+  multiline:
+    pattern: {{ .multilinePattern }}
+    negate: false
+    match: after
+  {{- end -}}
+  {{- end }}
 # TODO: etcd, apiserver and more..
 
 processors:
@@ -61,4 +83,18 @@ output.kafka:
     {{- end }}
     topic: {{ .topic }}
     version: {{ .version }}
-{{- end -}}
+    {{- if .max_message_bytes }}
+    max_message_bytes: {{ .max_message_bytes }}
+    {{- end }}
+{{- end }}
+
+{{- if eq .type "logstash" }}
+output.logstash:
+    hosts:
+    {{- range .hosts }}
+    - {{ . }}
+    {{- end }}
+    {{- if .loadbalance }}
+    loadbalance: {{- if eq .loadbalance "true"}}true{{- else }}false{{- end }}
+    {{- end }}
+{{- end }}
