@@ -26,6 +26,9 @@ filebeat.inputs:
     match: after
   {{- end -}}
   {{- end }}
+  {{ if .ignoreOlder -}}
+  ignore_older: {{ .ignoreOlder }}
+  {{- end }}  
 - type: log
   enabled: true
   fields_under_root: true
@@ -46,6 +49,9 @@ filebeat.inputs:
     match: after
   {{- end -}}
   {{- end }}
+  {{ if .ignoreOlder -}}
+  ignore_older: {{ .ignoreOlder }}
+  {{- end }} 
 # TODO: etcd, apiserver and more..
 
 processors:
