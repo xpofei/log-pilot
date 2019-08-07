@@ -27,7 +27,7 @@ _config:
       command:
       - /opt/filebeat-keeper/filebeat-keeper
       args:
-      - "--path.config=/etc/filebeat" 
+      - "--path.config=/etc/filebeat"
       - "--path.home=/opt/filebeat"
       - "-e"
       mounts:
@@ -78,6 +78,8 @@ _config:
       - name: docker-sock
         path: /var/run/docker.sock
         readonly: true
+    pod:
+      priorityClassName: platform-critical
     type: DaemonSet
     volumes:
     - name: varlog
