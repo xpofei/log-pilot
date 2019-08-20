@@ -78,8 +78,22 @@ _config:
       - name: docker-sock
         path: /var/run/docker.sock
         readonly: true
+    - image: '[[ registry_release ]]/beat-exporter:v0.1.2'
+      imagePullPolicy: Always
+      resources:
+        limits:
+          cpu: 100m
+          memory: 200Mi
+        requests:
+          cpu: 10m
+          memory: 20Mi
     pod:
       priorityClassName: platform-critical
+      annotations:
+      - key: prometheus.io/port
+        value: '9479'
+      - key: prometheus.io/scrape
+        value: 'true'
     type: DaemonSet
     volumes:
     - name: varlog
