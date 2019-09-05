@@ -59,17 +59,13 @@ filebeat.inputs:
 # TODO: etcd, apiserver and more..
 
 processors:
-{{ if .multilinePattern -}}
 - drop_fields:
-    fields: ["log"]
-{{- end }}
+    fields: ["beat", "host.name", "input.type", "prospector.type", "offset", "source", "log"]
 - rename:
     fields:
     - from: message
       to: log
     ignore_missing: true
-- drop_fields:
-    fields: ["beat", "host.name", "input.type", "prospector.type", "offset", "source", ]
 
 {{- if eq .type "elasticsearch" }}
 setup.template.enabled: true

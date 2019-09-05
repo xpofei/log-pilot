@@ -17,17 +17,17 @@ _config:
           key: name
       resources:
         limits:
-          memory: 200Mi
+          memory: 500Mi
           cpu: "2"
         requests:
-          memory: 50Mi
-          cpu: 100m
+          memory: 100Mi
+          cpu: 200m
       image: '[[ registry_release ]]/filebeat:[[ imageTagFromGitTag ]]'
       imagePullPolicy: Always
       command:
       - /opt/filebeat-keeper/filebeat-keeper
       args:
-      - "--path.config=/etc/filebeat" 
+      - "--path.config=/etc/filebeat"
       - "--path.home=/opt/filebeat"
       - "-e"
       mounts:
@@ -57,10 +57,11 @@ _config:
       - --path.filebeat-home=/opt/filebeat
       - --logLevel=debug
       - -e
-      env: 
+      env:
       - name: OUTPUT_CONFIG
-        from: 
+        from:
           type: Config
+          name: filebeat-output
           key: filebeat-output.yml
       resources:
         limits:
@@ -83,6 +84,21 @@ _config:
       - name: docker-sock
         path: /var/run/docker.sock
         readonly: true
+    - image: '[[ registry_release ]]/beat-exporter:v0.1.2'
+      imagePullPolicy: Always
+      resources:
+        limits:
+          cpu: 100m
+          memory: 200Mi
+        requests:
+          cpu: 10m
+          memory: 20Mi
+    pod:
+      annotations:
+      - key: prometheus.io/port
+        value: '9479'
+      - key: prometheus.io/scrape
+        value: 'true'
     type: DaemonSet
     volumes:
     - name: varlog
