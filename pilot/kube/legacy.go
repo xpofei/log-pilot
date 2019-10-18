@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	annotationLogFiles = "logging.caicloud.io/logfiles"
+	annotationLogFiles = "logging.caicloud.io/logfiles" // 文件日志，先不改
 )
 
 type LogFiles struct {

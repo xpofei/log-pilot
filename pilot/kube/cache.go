@@ -53,15 +53,27 @@ func (c *kubeCache) Start(stopCh <-chan struct{}) error {
 	return c.pc.lwCache.Run(stopCh)
 }
 
+const (
+	esReleaseKey   = "kubernetes.annotations.helm_sh/release"
+	esNamespaceKey = "kubernetes.annotations.helm_sh/namespace"
+)
+
 var (
-	releaseAnnotationKeys = map[string]string{
-		"helm.sh/namespace": "kubernetes.annotations.helm_sh/namespace",
-		"helm.sh/release":   "kubernetes.annotations.helm_sh/release",
-	}
+	releaseKey   = getEnv("RELEASE_KEY", "helm.sh/release")
+	namespaceKey = getEnv("NAMESPACE_KEY", "helm.sh/namespace")
+
+	releaseAnnotationKeys map[string]string
+
 	releaseLabelKeys = map[string]string{
 		"controller.caicloud.io/chart": "kubernetes.labels.controller_caicloud_io/chart",
 	}
 )
+
+func init() {
+	releaseAnnotationKeys = make(map[string]string, 2)
+	releaseAnnotationKeys[namespaceKey] = esNamespaceKey
+	releaseAnnotationKeys[releaseKey] = esReleaseKey
+}
 
 func releaseMeta(pod *corev1.Pod) map[string]string {
 	ret := make(map[string]string)
@@ -166,4 +178,11 @@ func (tc *podsCache) List() ([]corev1.Pod, error) {
 		return nil, e
 	}
 	return podList.Items, nil
+}
+
+func getEnv(name, def string) string {
+	if env := os.Getenv(name); env != "" {
+		return env
+	}
+	return def
 }
