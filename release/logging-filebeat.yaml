@@ -22,7 +22,7 @@ _config:
         requests:
           memory: 100Mi
           cpu: 200m
-      image: '[[ registry_release ]]/filebeat:[[ imageTagFromGitTag ]]'
+      image: '[[ registry_release ]]/filebeat-keeper:[[ imageTagFromGitTag ]]'
       imagePullPolicy: Always
       command:
       - /opt/filebeat-keeper/filebeat-keeper
