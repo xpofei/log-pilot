@@ -1,6 +1,7 @@
 package v1beta1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -73,6 +74,44 @@ type StorageService struct {
 	// create volumes of this storage class.
 	// +optional
 	Parameters map[string]string `json:"parameters,omitempty" protobuf:"bytes,3,rep,name=parameters"`
+
+	// StorageMetaData represents the current metadata for each storage backend.
+	// +optional
+	StorageMetaData StorageMetaData `json:"storageMetaData,omitempty"`
+
+	// quota
+
+	// Hard is the set of desired hard limits for each named resource.
+	Hard corev1.ResourceList `json:"hard"`
+	// Allocated is the amount of resources that have been allocated.
+	Allocated corev1.ResourceList `json:"allocated"`
+}
+
+// StorageMetaData is the data structure for each storage backend metadata.
+type StorageMetaData struct {
+	Ceph *CephMetaData `json:"ceph,omitempty"`
+}
+
+// CephMetaData is the data structure for Ceph metadata.
+type CephMetaData struct {
+	Pools []CephPool `json:"pools"`
+}
+
+// CephPool is the data structure for single Ceph storage pool.
+type CephPool struct {
+	Name        string `json:"name"`
+	ReplicaSize int    `json:"replicaSize"`
+	// Deprecated
+	// total capacity of the current pool, kb
+	Capacity int `json:"capacity"`
+	// maximum available capacity, kb
+	MaxAvailable int `json:"maxAvailable"`
+	// capacity usage, 0 - 100
+	PercentUsed float32 `json:"percentUsed"`
+	// capacity used, kb
+	Used int `json:"used"`
+	// number of objects in the pool
+	Objects int `json:"objects"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
