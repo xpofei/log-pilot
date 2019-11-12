@@ -29,7 +29,7 @@ TARGETS ?= log-pilot filebeat-keeper
 LOG_PILOT_IMAGE := $(REGISTRIES)/log-pilot:$(VERSION)
 FILEBEAT_IMAGE := $(REGISTRIES)/filebeat:$(VERSION)
 
-.PHONY: default container push
+.PHONY: default container push test lint
 
 default: push
 
@@ -59,3 +59,9 @@ container: build-linux
 push: container
 	docker push $(LOG_PILOT_IMAGE)
 	docker push $(FILEBEAT_IMAGE)
+
+test:
+	@echo "test is not used on this branch"
+
+lint:
+	@echo "lint is not used on this branch"
