@@ -1,14 +1,61 @@
-# Git commit sha.
-COMMIT := $(strip $(shell git rev-parse --short HEAD 2>/dev/null))
-COMMIT := $(if $(COMMIT),$(COMMIT),"Unknown")
+# Copyright 2019 The Caicloud Authors.
+#
+# The old school Makefile, following are required targets. The Makefile is written
+# to allow building multiple binaries. You are free to add more targets or change
+# existing implementations, as long as the semantics are preserved.
+#
+#   make              - default to 'build' target
+#   make lint         - code analysis
+#   make test         - run unit test (or plus integration test)
+#   make build        - alias to build-local target
+#   make build-local  - build local binary targets
+#   make build-linux  - build linux binary targets
+#   make container    - build containers
+#   $ docker login registry -u username -p xxxxx
+#   make push         - push containers
+#   make clean        - clean up targets
+#
+# Not included but recommended targets:
+#   make e2e-test
+#
+# The makefile is also responsible to populate project version information.
+#
+
+#
+# Tweak the variables based on your project.
+#
 
 # This repo's root import path (under GOPATH).
 ROOT := github.com/caicloud/log-pilot
 
-UPSTREAM_REGISTRY := cargo.caicloudprivatetest.com/caicloud
+# Target binaries. You can build multiple binaries for a single project.
+TARGETS ?= log-pilot filebeat-keeper
 
-# Container registries. You can use multiple registries for a single project.
-REGISTRIES ?= cargo.caicloudprivatetest.com/release
+# Container image prefix and suffix added to targets.
+# The final built images are:
+#   $[REGISTRY]/$[IMAGE_PREFIX]$[TARGET]$[IMAGE_SUFFIX]:$[VERSION]
+# $[REGISTRY] is an item from $[REGISTRIES], $[TARGET] is an item from $[TARGETS].
+IMAGE_PREFIX ?= $(strip )
+IMAGE_SUFFIX ?= $(strip )
+
+# Container registries.
+REGISTRY ?= cargo.dev.caicloud.xyz/release
+
+# Container registry for base images.
+BASE_REGISTRY ?= cargo.caicloud.xyz/library
+
+#
+# These variables should not need tweaking.
+#
+
+# It's necessary to set this because some environments don't link sh -> bash.
+export SHELL := /bin/bash
+
+# It's necessary to set the errexit flags for the bash shell.
+export SHELLOPTS := errexit
+
+# Project main package location (can be multiple ones).
+CMD_DIR := ./cmd
 
 # Project output directory.
 OUTPUT_DIR := ./bin
@@ -16,52 +63,80 @@ OUTPUT_DIR := ./bin
 # Build direcotory.
 BUILD_DIR := ./build
 
-# Project main package location (can be multiple ones).
-CMD_DIR := ./cmd
-
 # Current version of the project.
-VERSION ?= $(COMMIT)
+VERSION ?= $(shell git describe --tags --always --dirty)
 
-# Target binaries. You can build multiple binaries for a single project.
-TARGETS ?= log-pilot filebeat-keeper
+# Available cpus for compiling, please refer to https://github.com/caicloud/engineering/issues/8186#issuecomment-518656946 for more information.
+CPUS ?= $(shell /bin/bash hack/read_cpus_available.sh)
 
-# Docker image name.
-LOG_PILOT_IMAGE := $(REGISTRIES)/log-pilot:$(VERSION)
-FILEBEAT_IMAGE := $(REGISTRIES)/filebeat:$(VERSION)
+# Track code version with Docker Label.
+DOCKER_LABELS ?= git-describe="$(shell date -u +v%Y%m%d)-$(shell git describe --tags --always --dirty)"
 
-.PHONY: default container push test lint
+# Golang standard bin directory.
+GOPATH ?= $(shell go env GOPATH)
+BIN_DIR := $(GOPATH)/bin
+GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
 
-default: push
+# Git Branch
+BRANCH=$(shell git branch | grep \* | cut -d ' ' -f2)
 
-build-linux:
-	@for target in $(TARGETS); do                                                      \
-	  for registry in $(REGISTRIES); do                                                \
-	    docker run --rm                                                                \
-	      -v ${PWD}:/go/src/$(ROOT)                                                    \
-	      -w /go/src/$(ROOT)                                                           \
-	      -e GOOS=linux                                                                \
-	      -e GOARCH=amd64                                                              \
-	      -e CGO_ENABLED=0                                                             \
-	      -e GOPATH=/go                                                                \
-	        $(UPSTREAM_REGISTRY)/golang:1.10-alpine3.6                                 \
-	          go build -i -v -o $(OUTPUT_DIR)/$${target}                               \
-	            -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)              \
-	            -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                \
-	            -X $(ROOT)/pkg/version.RepoRoot=$(ROOT)"                               \
-	            ./$(CMD_DIR)/$${target};                                               \
-	  done                                                                             \
-	done
+#
+# Define all targets. At least the following commands are required:
+#
 
-container: build-linux
-	docker build -t $(LOG_PILOT_IMAGE) -f $(BUILD_DIR)/log-pilot/Dockerfile .
-	docker build -t $(FILEBEAT_IMAGE) -f $(BUILD_DIR)/filebeat/Dockerfile .
+# All targets.
+.PHONY: lint test build container push build-local build-linux
 
-push: container
-	docker push $(LOG_PILOT_IMAGE)
-	docker push $(FILEBEAT_IMAGE)
+build: build-local
+
+# more info about `GOGC` env: https://github.com/golangci/golangci-lint#memory-usage-of-golangci-lint
+lint:
+	echo "lint not ready"
 
 test:
-	@echo "test is not used on this branch"
+	@go test -p $(CPUS) $$(go list ./... | grep -v /vendor | grep -v /test) -coverprofile=coverage.out
+	@go tool cover -func coverage.out | tail -n 1 | awk '{ print "Total coverage: " $$3 }'
 
-lint:
-	@echo "lint is not used on this branch"
+build-local:
+	@for target in $(TARGETS); do                                                      \
+	  go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                            \
+	  -ldflags "-s -w -X $(ROOT)/version.version=$(VERSION)                            \
+	    -X $(ROOT)/version.commit=$(VERSION)                                           \
+	    -X $(ROOT)/version.branch=$(BRANCH)"                                           \
+	  $(CMD_DIR)/$${target};                                                           \
+	done
+
+build-linux:
+	@docker run --rm -t                                                                \
+	  -v $(PWD):/go/src/$(ROOT)                                                        \
+	  -w /go/src/$(ROOT)                                                               \
+	  -e GOOS=linux                                                                    \
+	  -e GOARCH=amd64                                                                  \
+	  -e GOPATH=/go                                                                    \
+	  -e SHELLOPTS=$(SHELLOPTS)                                                        \
+	  $(BASE_REGISTRY)/golang:1.10.4-stretch                                           \
+	    /bin/bash -c 'for target in $(TARGETS); do                                     \
+	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
+	        -ldflags "-s -w -X $(ROOT)/version.version=$(VERSION)                      \
+	          -X $(ROOT)/version.commit=$(VERSION)                                     \
+	          -X $(ROOT)/version.branch=$(BRANCH)"                                     \
+	        $(CMD_DIR)/$${target};                                                     \
+	    done'
+
+container: build-linux
+	@for target in $(TARGETS); do                                                      \
+	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
+	  docker build -t $(REGISTRY)/$${image}:$(VERSION)                                 \
+	    --label $(DOCKER_LABELS)                                                       \
+	    -f $(BUILD_DIR)/$${target}/Dockerfile .;                                       \
+	done
+
+push: container
+	@for target in $(TARGETS); do                                                      \
+	  image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                  \
+	  docker push $(REGISTRY)/$${image}:$(VERSION);                                    \
+	done
+
+.PHONY: clean
+clean:
+	@-rm -vrf ${OUTPUT_DIR}
