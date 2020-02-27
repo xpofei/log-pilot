@@ -22,6 +22,14 @@ filebeat.inputs:
     {{- range $k,$v := .fields }}
     {{ $k }}: {{ $v }}
     {{- end }}
+  {{ if .multilinePattern -}}
+  {{- if ne .multilinePattern ""}}
+  multiline:
+    pattern: {{ .multilinePattern }}
+    negate: false
+    match: after
+  {{- end -}}
+  {{- end }}
   {{ if .ignoreOlder -}}
   ignore_older: {{ .ignoreOlder }}
   {{- end }}  
@@ -37,6 +45,14 @@ filebeat.inputs:
     {{- range $k,$v := .fields }}
     {{ $k }}: {{ $v }}
     {{- end }}
+  {{ if .multilinePattern -}}
+  {{- if ne .multilinePattern ""}}
+  multiline:
+    pattern: {{ .multilinePattern }}
+    negate: false
+    match: after
+  {{- end -}}
+  {{- end }}
   {{ if .ignoreOlder -}}
   ignore_older: {{ .ignoreOlder }}
   {{- end }} 

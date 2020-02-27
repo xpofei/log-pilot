@@ -12,24 +12,17 @@
     cri_flags: true
   {{end}}
   fields:
-    cluster: ${CLUSTER_ID}
-    {{- range $key, $value := .Tags }}
-    {{ $key }}: "{{ $value }}"
-    {{- end }}
-  {{ if .Multiline -}}
+      cluster: ${CLUSTER_ID}
+      {{- range $key, $value := .Tags }}
+      {{ $key }}: "{{ $value }}"
+      {{- end }}
+  {{ if .MultilinePattern -}}
+  {{- if ne .MultilinePattern ""}}
   multiline:
-    pattern: {{ .Multiline.Pattern }}
-    negate: {{ .Multiline.Negate }}
-    match: {{ .Multiline.Match }}
-    {{ if .Multiline.FlushPattern -}}
-    flush_pattern: {{ .Multiline.FlushPattern }}
-    {{- end }}
-    {{ if .Multiline.MaxLines -}}
-    max_lines: {{ .Multiline.MaxLines }}
-    {{- end }}
-    {{ if .Multiline.Timeout -}}
-    timeout: {{ .Multiline.Timeout }}
-    {{- end }}
+    pattern: {{ .MultilinePattern }}
+    negate: false
+    match: after
+  {{- end -}}
   {{- end }}
   tail_files: false
   # Harvester closing options
