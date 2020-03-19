@@ -90,12 +90,14 @@ _config:
         requests:
           cpu: 10m
           memory: 20Mi
-    pod:
-      annotations:
-      - key: prometheus.io/port
-        value: '9479'
-      - key: prometheus.io/scrape
-        value: 'true'
+    services:
+    - name: logging-filebeat
+      ports:
+      - port: 5066
+        protocol: TCP
+      - port: 9479
+        protocol: TCP
+      type: ClusterIP
     type: DaemonSet
     schedule:
       tolerations:
