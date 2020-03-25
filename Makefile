@@ -72,6 +72,10 @@ CPUS ?= $(shell /bin/bash hack/read_cpus_available.sh)
 # Track code version with Docker Label.
 DOCKER_LABELS ?= git-describe="$(shell date -u +v%Y%m%d)-$(shell git describe --tags --always --dirty)"
 
+# This will force go to use the vendor files instead of using the `$GOPATH/pkg/mod`. (vendor mode)
+# more info: https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is-vendoring-going-away
+export GOFLAGS := -mod=vendor
+
 # Golang standard bin directory.
 GOPATH ?= $(shell go env GOPATH)
 BIN_DIR := $(GOPATH)/bin
@@ -113,8 +117,9 @@ build-linux:
 	  -e GOOS=linux                                                                    \
 	  -e GOARCH=amd64                                                                  \
 	  -e GOPATH=/go                                                                    \
+	  -e GOFLAGS=$(GOFLAGS)                                                            \
 	  -e SHELLOPTS=$(SHELLOPTS)                                                        \
-	  $(BASE_REGISTRY)/golang:1.12.12-stretch                                          \
+	  $(BASE_REGISTRY)/golang:1.13.6-stretch                                           \
 	    /bin/bash -c 'for target in $(TARGETS); do                                     \
 	      go build -i -v -o $(OUTPUT_DIR)/$${target} -p $(CPUS)                        \
 	        -ldflags "-s -w -X $(ROOT)/version.version=$(VERSION)                      \

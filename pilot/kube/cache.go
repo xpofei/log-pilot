@@ -119,12 +119,12 @@ func newPodsCache(nodeName string, kc kubernetes.Interface) (*podsCache, error) 
 	c, e := NewListWatchCache(&cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 			options.FieldSelector = fmt.Sprintf("spec.nodeName=%s", nodeName)
-			return kc.CoreV1().Pods("").List(options)
+			return kc.Native().CoreV1().Pods("").List(options)
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 			options.FieldSelector = fmt.Sprintf("spec.nodeName=%s", nodeName)
 			options.Watch = true
-			return kc.CoreV1().Pods("").Watch(options)
+			return kc.Native().CoreV1().Pods("").Watch(options)
 		},
 	}, &corev1.Pod{})
 	if e != nil {
@@ -142,7 +142,7 @@ func (tc *podsCache) Get(namespace, key string) (*corev1.Pod, error) {
 			return pod.DeepCopy(), nil
 		}
 	}
-	pod, e := tc.kc.CoreV1().Pods(namespace).Get(key, metav1.GetOptions{})
+	pod, e := tc.kc.Native().CoreV1().Pods(namespace).Get(key, metav1.GetOptions{})
 	if e != nil {
 		return nil, e
 	}
@@ -161,7 +161,7 @@ func (tc *podsCache) List() ([]corev1.Pod, error) {
 			return re, nil
 		}
 	}
-	podList, e := tc.kc.CoreV1().Pods("").List(metav1.ListOptions{})
+	podList, e := tc.kc.Native().CoreV1().Pods("").List(metav1.ListOptions{})
 	if e != nil {
 		return nil, e
 	}
