@@ -1,4 +1,4 @@
-FROM cargo.caicloud.xyz/library/filebeat:6.7.2
+FROM cargo.caicloud.xyz/library/filebeat:6.8.6
 
 USER root
 RUN mkdir /etc/filebeat
