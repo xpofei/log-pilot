@@ -3,11 +3,12 @@ github.com/BurntSushi/toml
 # github.com/Microsoft/go-winio v0.4.14
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/caicloud/clientset v0.0.0-20200311021253-e5f43fda7589
+# github.com/caicloud/clientset v0.0.0-20200420062837-792b5fced8a6
 github.com/caicloud/clientset/customclient
 github.com/caicloud/clientset/customclient/scheme
 github.com/caicloud/clientset/customclient/typed/alerting/v1alpha1
 github.com/caicloud/clientset/customclient/typed/alerting/v1alpha2
+github.com/caicloud/clientset/customclient/typed/alerting/v1beta1
 github.com/caicloud/clientset/customclient/typed/apiregistration/v1
 github.com/caicloud/clientset/customclient/typed/clever/v1alpha1
 github.com/caicloud/clientset/customclient/typed/clever/v1alpha2
@@ -34,6 +35,7 @@ github.com/caicloud/clientset/customclient/typed/workload/v1beta1
 github.com/caicloud/clientset/kubernetes
 github.com/caicloud/clientset/pkg/apis/alerting/v1alpha1
 github.com/caicloud/clientset/pkg/apis/alerting/v1alpha2
+github.com/caicloud/clientset/pkg/apis/alerting/v1beta1
 github.com/caicloud/clientset/pkg/apis/apiregistration/v1
 github.com/caicloud/clientset/pkg/apis/clever/v1alpha1
 github.com/caicloud/clientset/pkg/apis/clever/v1alpha2
@@ -60,7 +62,7 @@ github.com/caicloud/clientset/pkg/apis/workload/v1beta1
 # github.com/caicloud/logging-admin v2.4.2+incompatible
 github.com/caicloud/logging-admin/pkg/util/graceful
 github.com/caicloud/logging-admin/pkg/util/osutil
-# github.com/caicloud/nirvana v0.2.1
+# github.com/caicloud/nirvana v0.2.6
 github.com/caicloud/nirvana/log
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
@@ -90,7 +92,7 @@ github.com/docker/go-connections/sockets
 github.com/docker/go-connections/tlsconfig
 # github.com/docker/go-units v0.4.0
 github.com/docker/go-units
-# github.com/elastic/beats v6.8.4+incompatible
+# github.com/elastic/beats v6.8.6+incompatible
 github.com/elastic/beats/libbeat/common/file
 github.com/elastic/beats/libbeat/logp
 github.com/elastic/beats/libbeat/paths
@@ -133,7 +135,7 @@ github.com/opencontainers/go-digest
 github.com/pkg/errors
 # github.com/satori/go.uuid v1.2.0
 github.com/satori/go.uuid
-# go.uber.org/atomic v1.5.0
+# go.uber.org/atomic v1.6.0
 go.uber.org/atomic
 # go.uber.org/multierr v1.4.0
 go.uber.org/multierr
@@ -147,7 +149,7 @@ go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 go.uber.org/zap/zaptest/observer
-# golang.org/x/crypto v0.0.0-20200210222208-86ce3cb69678
+# golang.org/x/crypto v0.0.0-20200220183623-bac4c82f6975
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/lint v0.0.0-20190930215403-16217165b5de
 golang.org/x/lint
@@ -232,7 +234,7 @@ honnef.co/go/tools/staticcheck/vrp
 honnef.co/go/tools/stylecheck
 honnef.co/go/tools/unused
 honnef.co/go/tools/version
-# k8s.io/api v0.17.3
+# k8s.io/api v0.17.5
 k8s.io/api/admissionregistration/v1
 k8s.io/api/admissionregistration/v1beta1
 k8s.io/api/apps/v1
@@ -273,7 +275,7 @@ k8s.io/api/settings/v1alpha1
 k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
-# k8s.io/apiextensions-apiserver v0.17.3
+# k8s.io/apiextensions-apiserver v0.17.5
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1
 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1
@@ -281,7 +283,7 @@ k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset
 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme
 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1
 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1
-# k8s.io/apimachinery v0.17.3
+# k8s.io/apimachinery v0.17.5
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
 k8s.io/apimachinery/pkg/api/meta
@@ -322,7 +324,7 @@ k8s.io/apimachinery/pkg/util/yaml
 k8s.io/apimachinery/pkg/version
 k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/client-go v0.17.3
+# k8s.io/client-go v0.17.5
 k8s.io/client-go/discovery
 k8s.io/client-go/kubernetes
 k8s.io/client-go/kubernetes/scheme
