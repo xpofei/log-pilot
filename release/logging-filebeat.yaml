@@ -9,7 +9,8 @@ _config:
     version: "[[ imageTagFromGitTag ]]"
   controllers:
   - containers:
-    - image: '[[ registry_release ]]/filebeat-keeper:[[ imageTagFromGitTag ]]'
+    - name: filebeat-keeper
+      image: '[[ registry_release ]]/filebeat-keeper:[[ imageTagFromGitTag ]]'
       imagePullPolicy: Always
       command:
       - /opt/filebeat-keeper/filebeat-keeper
@@ -48,7 +49,8 @@ _config:
         subpath: filebeat
       - name: output-config
         path: /config
-    - image: '[[ registry_release ]]/log-pilot:[[ imageTagFromGitTag ]]'
+    - name: log-pilot-sidecar
+      image: '[[ registry_release ]]/log-pilot:[[ imageTagFromGitTag ]]'
       imagePullPolicy: Always
       command:
       - /opt/log-pilot/bin/log-pilot
@@ -88,7 +90,8 @@ _config:
         path: /var/run/docker.sock
         readonly: true
         propagation: HostToContainer
-    - image: '[[ registry_release ]]/beat-exporter:0.3.1'
+    - name: exporter-sidecar
+      image: '[[ registry_release ]]/beat-exporter:0.3.1'
       imagePullPolicy: Always
       resources:
         limits:
