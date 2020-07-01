@@ -29,7 +29,7 @@ _config:
           cpu: "2"
         requests:
           memory: 200Mi
-          cpu: 20m
+          cpu: 100m
       mounts:
       - name: kubeletpods
         path: /var/lib/kubelet/pods
@@ -67,10 +67,10 @@ _config:
           optional: true
       resources:
         limits:
-          cpu: 20m
+          cpu: 50m
           memory: 50Mi
         requests:
-          cpu: 10m
+          cpu: 20m
           memory: 20Mi
       mounts:
       - name: kubeletpods
@@ -93,10 +93,10 @@ _config:
       imagePullPolicy: Always
       resources:
         limits:
-          cpu: 20m
+          cpu: 50m
           memory: 50Mi
         requests:
-          cpu: 10m
+          cpu: 20m
           memory: 20Mi
     pod:
       annotations:
