@@ -104,6 +104,9 @@ _config:
       - key: prometheus.io/scrape
         value: 'true'
     type: DaemonSet
+    schedule:
+      tolerations:
+      - operator: Exists   # toleraint all taint, even the taint is added by user
     volumes:
     - name: varlog
       source:
