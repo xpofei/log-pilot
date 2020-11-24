@@ -1,33 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [log-pilot](#log-pilot)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 log-pilot
 =========
 
-[![CircleCI](https://circleci.com/gh/AliyunContainerService/log-pilot.svg?style=svg)](https://circleci.com/gh/AliyunContainerService/log-pilot)
+Log-pilot is a rewrite of [log-pilot](https://github.com/AliyunContainerService/log-pilot), thanks its awesome idea to run filebeat/fluentd as a sidecar and let log-pilot do container log discovery and manage configurations.
+Log-pilot only support filebeat for easier maintaince and better performance. Also, filebeat is more cloud native than fluentd.
 
-`log-pilot` is an awesome docker log tool. With `log-pilot` you can collect logs from docker hosts and send them to your centralized log system such as elasticsearch, graylog2, awsog and etc. `log-pilot` can collect not only docker stdout but also log file that inside docker containers.
+The architecture described as bellow
 
-Try it
-======
-
-Prerequisites:
-
-- docker-compose >= 1.6
-- Docker Engine >= 1.10
-
-```
-# download log-pilot project
-git clone git@github.com:AliyunContainerService/log-pilot.git
-# build log-pilot image
-cd log-pilot/ && ./build-image.sh
-# quick start
-cd quickstart/ && ./run
-```
-
-Then access kibana under the tips. You will find that tomcat's has been collected and sended to kibana.
-
-Create index:
-![kibana](quickstart/Kibana.png)
-
-Query the logs:
-![kibana](quickstart/Kibana2.png)
-
-Quickstart
+![log-pilot-arch](./docs/assets/log-pilot-arch.png)

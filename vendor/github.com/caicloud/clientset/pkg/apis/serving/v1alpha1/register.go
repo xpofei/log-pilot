@@ -23,8 +23,9 @@ limitations under the License.
 package v1alpha1
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/runtime/scheme"
 )
 
 const (
@@ -39,14 +40,23 @@ var (
 	SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: Version}
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
-	SchemeBuilder = &scheme.Builder{GroupVersion: SchemeGroupVersion}
+	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 
 	// AddToScheme is required by pkg/client/...
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
-func init() {
-	SchemeBuilder.Register(&Serving{}, &ServingList{}, &Scene{}, &SceneList{})
+// Adds the list of known types to api.Scheme.
+func addKnownTypes(scheme *runtime.Scheme) error {
+	scheme.AddKnownTypes(SchemeGroupVersion,
+		&Serving{},
+		&ServingList{},
+		&Scene{},
+		&SceneList{},
+	)
+
+	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+	return nil
 }
 
 // Resource is required by pkg/client/listers/...

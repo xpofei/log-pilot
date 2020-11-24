@@ -9,7 +9,15 @@ _config:
     version: "[[ imageTagFromGitTag ]]"
   controllers:
   - containers:
-    - env:
+    - image: '[[ registry_release ]]/filebeat-keeper:[[ imageTagFromGitTag ]]'
+      imagePullPolicy: Always
+      command:
+      - /opt/filebeat-keeper/filebeat-keeper
+      args:
+      - "--path.config=/etc/filebeat"
+      - "--path.home=/opt/filebeat"
+      - "-e"
+      env:
       - name: CLUSTER_ID
         from:
           type: Config
@@ -20,16 +28,8 @@ _config:
           memory: 500Mi
           cpu: "2"
         requests:
-          memory: 100Mi
-          cpu: 200m
-      image: '[[ registry_release ]]/filebeat-keeper:[[ imageTagFromGitTag ]]'
-      imagePullPolicy: Always
-      command:
-      - /opt/filebeat-keeper/filebeat-keeper
-      args:
-      - "--path.config=/etc/filebeat"
-      - "--path.home=/opt/filebeat"
-      - "-e"
+          memory: 200Mi
+          cpu: 100m
       mounts:
       - name: kubeletpods
         path: /var/lib/kubelet/pods
@@ -67,10 +67,10 @@ _config:
           optional: true
       resources:
         limits:
-          cpu: 100m
-          memory: 200Mi
+          cpu: 50m
+          memory: 50Mi
         requests:
-          cpu: 10m
+          cpu: 20m
           memory: 20Mi
       mounts:
       - name: kubeletpods
@@ -93,10 +93,10 @@ _config:
       imagePullPolicy: Always
       resources:
         limits:
-          cpu: 100m
-          memory: 200Mi
+          cpu: 50m
+          memory: 50Mi
         requests:
-          cpu: 10m
+          cpu: 20m
           memory: 20Mi
     pod:
       annotations:
@@ -105,6 +105,9 @@ _config:
       - key: prometheus.io/scrape
         value: 'true'
     type: DaemonSet
+    schedule:
+      tolerations:
+      - operator: Exists   # toleraint all taint, even the taint is added by user
     volumes:
     - name: varlog
       source:
